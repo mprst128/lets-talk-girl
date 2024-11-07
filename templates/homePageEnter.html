@@ -53,7 +53,13 @@
                 }
             }
         
-            #post-form {
+            #connexion {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            #creation {
                 width: 100%;
                 display: flex;
                 flex-direction: column;
@@ -87,6 +93,7 @@
         
                 input[type=submit]:hover {
                 background-color: #a64497;
+                align-items: center;
                 }
 
 </style>
@@ -94,11 +101,14 @@
     <img class="image" src="images/logoOff.png" alt="Logo">
     <div class="container">
         <div>
-            <h2>What is "Let's Talk Girl" ?</h2>
-            <p>Let's Talk Girl, a conversation-oriented platform designed to help women explore her minded individuals.</p>
+            <h2>CONNEXION</h2>
+            <p>Pour lancer une conversation, vous devez vous connecter à votre compte. Si vous n'en avez pas : cliquez sur le bouton "Créer un compt"</p>
         </div>
-        <form id = "post-form" method="POST" action="checkview">
-            <input type="submit" value="Begin a Chat" href="http://localhost:lets-talk-girl/lets-talk-girl/templates/lienSuiviMail.html">
+        <form id = "connexion" method="POST" action="checkview">
+            <input type="submit" value="Me connecter" href="http://localhost:lets-talk-girl/lets-talk-girl/templates/lienSuiviMail.html">
+        </form>
+        <form id = "creation" method="POST" action="checkview">
+            <input type="submit" value="Créer un compte" href="http://localhost:lets-talk-girl/lets-talk-girl/templates/lienSuiviMail.html">
         </form>
     </div>
 </body>
