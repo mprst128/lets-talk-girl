@@ -5,7 +5,8 @@ from chat import views
 # Définition des routes URL pour les vues
 urlpatterns = [
     path('admin/', admin.site.urls),  # Page d'administration Django
-    path('', views.home, name='home'),  # Page d'accueil avec formulaire
+    path('', views.pageEntrer, name='pageEntrer'),  # Page d'accueil avec formulaire
+    path('home', views.home, name='home'),  # Page d'accueil avec formulaire
     path('create_room/', views.create_room, name='create_room'),  # Page pour créer une room
     path('send_mail/', views.send_mail, name='send_mail'),  # Envoi de l'email d'invitation
     path('room/<str:room_name>/', views.room, name='room'),  # Page d'une room avec le paramètre room_name

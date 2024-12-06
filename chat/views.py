@@ -8,20 +8,25 @@ from email.mime.multipart import MIMEMultipart
 import smtplib, ssl
 from django.core.mail import send_mail
 
+# méthode vue page entrer
+def pageEntrer(request):
+    return render(request, 'pageEntrer.html')
 
+# méthode vue room, nécessite room_name
 def home(request):
     room_name = request.GET.get('room_name', '')   
     return render(request, 'home.html', {'room_name': room_name})
 
-def room(request, room):
-    username = request.GET.get('username')  # Récupère le nom d'utilisateur depuis l'URL
-    room_details = Room.objects.get(name=room)  # Récupère les détails de la room par son nom
-
+# méthode vue room avec filtre de recherche
+def room(request, room_name):
+    username = request.GET.get('username')   
+    try:
+        room_details = Room.objects.get(name=room_name)  
+    except Room.DoesNotExist:
+        return render(request, 'home.html', {'error': 'Room non trouvée'})  
     # Récupérer les paramètres de recherche (nom d'utilisateur et mot-clé)
     search_username = request.GET.get('username_search', '')  # Si un nom d'utilisateur est fourni
     search_keyword = request.GET.get('keyword_search', '')  # Si un mot-clé est fourni
-
-    # Récupérer tous les messages de la room
     messages = Message.objects.filter(room=room_details.id).order_by('date')
 
     # Appliquer le filtre par nom d'utilisateur (si présent)
@@ -31,17 +36,17 @@ def room(request, room):
     # Appliquer le filtre par mot-clé dans le message (si présent)
     if search_keyword:
         messages = messages.filter(value__icontains=search_keyword)
-
-    # Passer les informations nécessaires à la template
     return render(request, 'room.html', {
         'username': username,
-        'room': room,
+        'room': room_name,
         'room_details': room_details,
         'messages': messages,  # Les messages filtrés sont passés à la template
         'search_username': search_username,
         'search_keyword': search_keyword,
     })
 
+# méthode pour envoyer des messages
+# attention le nom ne s'affiche plus dans le message, username 🔺
 def send(request):
     message = request.POST['message']
     username = request.POST['username']
@@ -56,8 +61,9 @@ def send(request):
     new_message = Message.objects.create(value= message , user = username , room = room)
     new_message.save()
     return HttpResponse('Message envoyé avec succès')
-    #django-cryptography pour crypter tout les messages
+    #django-cryptography pour crypter tout les messages, pas forcément cette bib
 
+# méthode pour créer une room à partir des données du formulaire, envoie le mail 
 def create_room(request):
     unique_link = None 
     if request.method == "POST":
@@ -77,7 +83,7 @@ def create_room(request):
     return render(request, 'create_room.html', {'unique_link': unique_link})
 #rajouter un fichier d'exception pour la gestion d'erreur pour mdp 
 
-#ajouter une methode d'invitation à partir de la room
+# méthode pour envoyer un lien d'accés par mail 🔺 attention rajouter le mdp dedans 
 def send_invitation_email(request, email, room_name, unique_link):
     lien = f"http://{request.get_host()}/access_room/{unique_link}"
     # Configuration du serveur SMTP
@@ -118,6 +124,7 @@ def send_invitation_email(request, email, room_name, unique_link):
     except Exception as e:
         print(f"Erreur lors de l'envoi de l'email : {e}")
         
+#  méthode pour acceder à une room avec nom de la room, password et username de l'utilisateur
 def join_room(request):
     if request.method == 'POST':
         room_name = request.POST.get('room_name')
@@ -134,6 +141,7 @@ def join_room(request):
         return redirect(f'/room/{room.name}/')
     return render(request, 'join_room.html')
 
+# méthode pour acceder à une room depuis le lien unique envoyé par mail, accés par join_room
 def access_room(request, unique_link):
     try:
         room = Room.objects.get(unique_link=unique_link)
@@ -151,26 +159,22 @@ def access_room(request, unique_link):
         return HttpResponse("Lien invalide ou expiré.")
 
 
-
+# méthode pour récupérer les messages
 def getMessages(request, room):
     room_details = Room.objects.get(name=room)
-    
-    # Récupérer les paramètres de recherche depuis la requête GET
     search_username = request.GET.get('username_search', '')
     search_keyword = request.GET.get('keyword_search', '')
 
     # Récupérer tous les messages de la room
     messages = Message.objects.filter(room=room_details.id).order_by('date')
 
-    # Appliquer le filtre par nom d'utilisateur
+    # Appliquer le filtre par nom d'utilisateur 
     if search_username:
         messages = messages.filter(user__icontains=search_username)
 
     # Appliquer le filtre par mot-clé dans le message
     if search_keyword:
         messages = messages.filter(value__icontains=search_keyword)
-
-    # Retourner les messages filtrés sous forme de JSON
     return JsonResponse({"messages": list(messages.values())})
 
 

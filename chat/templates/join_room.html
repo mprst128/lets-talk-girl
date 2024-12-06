@@ -1,10 +1,10 @@
-
 <!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<style>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;1,200;1,300;1,400&display=swap');
             *{
                 margin: 0;
@@ -88,18 +88,24 @@
                 input[type=submit]:hover {
                 background-color: #a64497;
                 }
-
-</style>
-<body >
-    <img class="image" src="images/logoOff.png" alt="Logo">
-    <div class="container">
-        <div>
-            <h2>What is "Let's Talk Girl" ?</h2>
-            <p>Let's Talk Girl, a conversation-oriented platform designed to help women explore her minded individuals.</p>
-        </div>
-        <form id = "post-form" method="POST" action="checkview">
-            <input type="submit" value="Begin a Chat" href="http://localhost:lets-talk-girl/lets-talk-girl/templates/lienSuiviMail.html">
-        </form>
-    </div>
-</body>
+  </style>
+  <body>
+    <h2>Accéder à un Canal</h2>
+    {% if error %}
+    <p style="color: red">{{ error }}</p>
+    {% endif %}
+    <form method="POST">
+      {% csrf_token %}
+      <input type="text" name="room_name" placeholder="Nom du canal" required />
+      <input
+        type="text"
+        name="username"
+        placeholder="Nom d'utilisateur"
+        required
+      />
+      <input type="password" name="password" placeholder="Mot de passe" />
+      <input type="submit" value="Accéder" />
+    </form>
+  </body>
 </html>
+ 
