@@ -1,10 +1,11 @@
-
 <!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<style>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Créer un Canal</title>
+  </head>
+  <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;1,200;1,300;1,400&display=swap');
             *{
                 margin: 0;
@@ -53,13 +54,7 @@
                 }
             }
         
-            #connexion {
-                width: 100%;
-                display: flex;
-                flex-direction: column;
-            }
-
-            #creation {
+            #post-form {
                 width: 100%;
                 display: flex;
                 flex-direction: column;
@@ -93,23 +88,25 @@
         
                 input[type=submit]:hover {
                 background-color: #a64497;
-                align-items: center;
                 }
+  </style>
+  <body>
+    <h1>Créer un Canal</h1>
 
-</style>
-<body >
-    <img class="image" src="images/logoOff.png" alt="Logo">
-    <div class="container">
-        <div>
-            <h2>CONNEXION</h2>
-            <p>Pour lancer une conversation, vous devez vous connecter à votre compte. Si vous n'en avez pas : cliquez sur le bouton "Créer un compt"</p>
-        </div>
-        <form id = "connexion" method="POST" action="checkview">
-            <input type="submit" value="Me connecter" href="http://localhost:lets-talk-girl/lets-talk-girl/templates/lienSuiviMail.html">
-        </form>
-        <form id = "creation" method="POST" action="checkview">
-            <input type="submit" value="Créer un compte" href="http://localhost:lets-talk-girl/lets-talk-girl/templates/lienSuiviMail.html">
-        </form>
-    </div>
-</body>
+    <!-- Formulaire pour créer le canal -->
+    <form method="POST" action="{% url 'create_room' %}">
+      {% csrf_token %}
+      <label for="room_name">Nom du canal :</label>
+      <input type="text" name="room_name" required /><br />
+
+      <label for="password">Mot de passe :</label>
+      <input type="password" name="password" required /><br />
+
+      <label for="emails">Email(s) d'invitation :</label>
+      <input type="email" name="emails" required multiple />
+      <input type="email" name="emails" required multiple /><br />
+
+      <button type="submit">Créer le Canal</button>
+    </form>
+  </body>
 </html>
