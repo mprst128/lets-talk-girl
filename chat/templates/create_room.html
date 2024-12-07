@@ -100,7 +100,12 @@
       <input type="text" name="room_name" required /><br />
 
       <label for="password">Mot de passe :</label>
-      <input type="password" name="password" required /><br />
+      <input type="password" id="password" name="password"
+      pattern="^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$"
+      title="Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial." required /><br />
+      {% if error %}
+      <p style="color: red;">{{ error }}</p>
+      {% endif %}
 
       <label for="emails">Email(s) d'invitation :</label>
       <input type="email" name="emails" required multiple />
