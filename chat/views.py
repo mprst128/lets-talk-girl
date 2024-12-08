@@ -66,7 +66,7 @@ def send(request):
 
 def validate_password(password):
     # vérifie que le mot de passe respecte le pattern
-    if not re.match(r'(?=.?[A-Z])(?=.?[a-z])(?=.?[0-9])(?=.?[#?!@$%^&*-]).{8,}', password):
+    if not re.match(r"(?=.?[A-Z])(?=.?[a-z])(?=.?[0-9])(?=.?[#?!@$%^&*-]).{8,}", password):        
         return False
     return True
 
