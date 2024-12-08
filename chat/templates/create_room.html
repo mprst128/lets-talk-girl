@@ -101,10 +101,10 @@
 
       <label for="password">Mot de passe :</label>
       <input type="password" id="password" name="password"
-        pattern="(?=.?[A-Z])(?=.?[a-z])(?=.?[0-9])(?=.?[#?!@$%^&*-]).{8,}"
-        title="Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule et un chiffres" required /><br />
+        pattern="(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}"
+        title="Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minusucle, un chiffre et un caractère spécials" required /><br />
       
-      {% if error %}
+        {% if error %}
       <p style="color: red;">{{ error }}</p>
       {% endif %}
 
