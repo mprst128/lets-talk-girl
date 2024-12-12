@@ -6,8 +6,11 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import smtplib, ssl
 from django.core.mail import send_mail
+
 from .models import Room
 from .models import Message
+
+import re
 
 # méthode vue page entrer
 def pageEntrer(request):
@@ -64,13 +67,24 @@ def send(request):
     return HttpResponse('Message envoyé avec succès')
     #django-cryptography pour crypter tout les messages, pas forcément cette bib
 
+def validate_password(password):
+    # vérifie que le mot de passe respecte le pattern
+    if not re.match(r"(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}", password):
+        return False
+    return True
+
 # méthode pour créer une room à partir des données du formulaire, envoie le mail 
 def create_room(request):
     unique_link = None 
     if request.method == "POST":
         room_name = request.POST['room_name']  
         password = request.POST['password']  
-        emails = request.POST.getlist('emails')   
+        emails = request.POST.getlist('emails')
+       
+        if not validate_password(password):
+            # Mot de passe invalide, retourner un message d'erreur
+            return render(request, 'create_room.html', {'error': "Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial."})
+
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         #boucler ici
         unique_link = str(uuid.uuid4())  # Définir unique_link dans le cas POST
