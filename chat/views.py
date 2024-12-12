@@ -1,4 +1,3 @@
-from .models import Message, Room 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse , JsonResponse , HttpResponseBadRequest
 import bcrypt
@@ -7,6 +6,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import smtplib, ssl
 from django.core.mail import send_mail
+from .models import Room
+from .models import Message
 
 # méthode vue page entrer
 def pageEntrer(request):
@@ -175,6 +176,17 @@ def getMessages(request, room):
     # Appliquer le filtre par mot-clé dans le message
     if search_keyword:
         messages = messages.filter(value__icontains=search_keyword)
-    return JsonResponse({"messages": list(messages.values())})
 
 
+    # Déchiffrer les messages avant d'envoyer
+    decrypted_messages = []
+    for message in messages:
+        decrypted_message = message.get_decrypted_message()
+        decrypted_messages.append({
+            "user" : message.user,
+            "value": decrypted_message,
+            "date": message.date
+        })
+
+    return JsonResponse({"messages": decrypted_messages})
+    

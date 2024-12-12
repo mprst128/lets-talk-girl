@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from cryptography.fernet import Fernet
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -130,3 +132,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+ENCRYPTION_KEY = os.getenv('ENCRYPTION_KEY')
+
+if not ENCRYPTION_KEY:
+    raise ValueError("Clé non définie dans les variables d'environnement")
+
+#$env:ENCRYPTION_KEY="uyyO602N1v2MUfuQz7oCvZuvpEe57icgCvjBDr5ldaw="
