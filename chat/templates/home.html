@@ -20,7 +20,7 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        background-image: url(images/background.jpg);
+        background-image: url("{% static 'images/background.jpg' %}");
         margin-top: -80px;
       }
 
@@ -76,7 +76,8 @@
     </style>
     <div>
       <h2>Let's Talk Girl</h2>
-      <img class="image" src="images/logoOff.png" alt="Logo" />
+      {% load static %}
+      <img class="image" src="{% static 'images/logo.png' %}" alt="" />
     </div>
     <a href="{% url 'create_room' %}">
       <button>Créer un Canal</button>

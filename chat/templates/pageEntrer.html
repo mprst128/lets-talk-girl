@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {% load static %}
   </head>
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;1,200;1,300;1,400&display=swap");
@@ -19,7 +20,7 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      background-image: url(/chat/templates/images/background.jpg);
+      background-image: url("{% static 'images/background.jpg' %}");
       margin-top: -100px;
     }
 
@@ -84,7 +85,7 @@
     }
   </style>
   <body>
-    <img class="image" src="/chat/templates/images/LogoOff.png" alt="Logo" />
+    <img class="image" src="{% static 'images/logo.png' %}" alt="" />
     <div class="container">
       <div>
         <h2>C'est quoi "Let's Talk Girl" ?</h2>
