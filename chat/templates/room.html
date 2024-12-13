@@ -129,45 +129,71 @@
     <script>
       $(document).ready(function () {
         var display = $("#display");
-        setInterval(function () {
+        var noMessages = $("#no-messages");
+
+        // Fonction pour récupérer les messages filtrés en ajax
+        function getMessagesFiltered() {
+          var username_search = $("#username_search").val();
+          var keyword_search = $("#keyword_search").val();
+
           $.ajax({
             type: "GET",
-            url: "/getMessages/{{room}}/",
+            url: "/getMessages/{{ room }}/",
+            data: {
+              username_search: username_search,
+              keyword_search: keyword_search,
+            },
             success: function (response) {
               console.log(response);
               var isAtBottom =
                 display.scrollTop() + display.innerHeight() >=
                 display[0].scrollHeight;
               $("#display").empty();
-              for (var key in response.messages) {
-                var rawDate = new Date(response.messages[key].date);
-                var formattedDate = rawDate.toLocaleString("fr-FR", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
-                var temp =
-                  "<div class='darker'><b>" +
-                  response.messages[key].user +
-                  "</b><p>" +
-                  response.messages[key].value +
-                  "</p><span>" +
-                  formattedDate +
-                  "</span></div>";
-                $("#display").append(temp);
-              }
 
-              if (isAtBottom) {
-                $("#display").scrollTop($("#display")[0].scrollHeight);
+              // Si aucun message, afficher "Aucun message trouvé"
+              if (response.messages.length === 0) {
+                noMessages.show();
+              } else {
+                noMessages.hide();
+                // Ajouter les messages dans l'affichage
+                for (var key in response.messages) {
+                  var rawDate = new Date(response.messages[key].date);
+                  var formattedDate = rawDate.toLocaleString("fr-FR", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
+                  var temp =
+                    "<div class='darker'><b>" +
+                    response.messages[key].user +
+                    "</b><p>" +
+                    response.messages[key].value +
+                    "</p><span>" +
+                    formattedDate +
+                    "</span></div>";
+                  $("#display").append(temp);
+                }
+                // Scroll to the bottom of the chat window if the user is already at the bottom
+                if (isAtBottom) {
+                  $("#display").scrollTop($("#display")[0].scrollHeight);
+                }
               }
             },
-            error: function (response) {
-              alert("An error occured");
+            error: function () {
+              alert("An error occurred while fetching the messages.");
             },
           });
-        }, 500);
+        }
+
+        // Fonction pour rafraîchir les messages toutes les 2 secondes
+        setInterval(getMessagesFiltered, 2000);
+
+        // Toggle display of search form
+        $("#search-button").on("click", function () {
+          $("#search-form").toggle();
+        });
       });
     </script>
 

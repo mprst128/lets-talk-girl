@@ -24,7 +24,9 @@ def home(request):
 
 # méthode vue room avec filtre de recherche
 def room(request, room_name):
-    username = request.GET.get('username')   
+    username = request.GET.get('username') 
+    username = request.session.get('username')
+  
     try:
         room_details = Room.objects.get(name=room_name)  
     except Room.DoesNotExist:
@@ -51,10 +53,11 @@ def room(request, room_name):
     })
 
 # méthode pour envoyer des messages
-# attention le nom ne s'affiche plus dans le message, username 🔺
 def send(request):
     message = request.POST['message']
     username = request.POST['username']
+    username = request.session.get('username')
+
     room_id = request.POST['room_id']
     if not room_id:
         return HttpResponseBadRequest("L'Id de la room est obligatoire")
@@ -145,6 +148,7 @@ def join_room(request):
     if request.method == 'POST':
         room_name = request.POST.get('room_name')
         username = request.POST.get('username')
+        request.session['username'] = username
         password = request.POST.get('password')
         if not room_name or not username or not password:
             return render(request, 'join_room.html', {'error': 'Tous les champs sont requis'})
@@ -168,6 +172,7 @@ def access_room(request, unique_link):
     room = link.room
     if request.method == 'POST':
         username = request.POST.get('username')
+        request.session['username'] = username
         password = request.POST.get('password')
         if room.password and not bcrypt.checkpw(password.encode('utf-8'), room.password.encode('utf-8')):
             return render(request, 'join_room.html', {'error': 'Mot de passe incorrect'})
