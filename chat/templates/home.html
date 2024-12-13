@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {% load static %}
   </head>
   <body>
     <style>
@@ -76,7 +77,6 @@
     </style>
     <div>
       <h2>Let's Talk Girl</h2>
-      {% load static %}
       <img class="image" src="{% static 'images/logo.png' %}" alt="" />
     </div>
     <a href="{% url 'create_room' %}">
