@@ -1,3 +1,4 @@
+from .models import Message, Room , UniqueLink
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse , JsonResponse , HttpResponseBadRequest
 import bcrypt
@@ -65,7 +66,6 @@ def send(request):
     new_message = Message.objects.create(value= message , user = username , room = room)
     new_message.save()
     return HttpResponse('Message envoyé avec succès')
-    #django-cryptography pour crypter tout les messages, pas forcément cette bib
 
 def validate_password(password):
     # vérifie que le mot de passe respecte le pattern
@@ -75,7 +75,7 @@ def validate_password(password):
 
 # méthode pour créer une room à partir des données du formulaire, envoie le mail 
 def create_room(request):
-    unique_link = None 
+    unique_links = []  
     if request.method == "POST":
         room_name = request.POST['room_name']  
         password = request.POST['password']  
@@ -86,21 +86,18 @@ def create_room(request):
             return render(request, 'create_room.html', {'error': "Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial."})
 
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        #boucler ici
-        unique_link = str(uuid.uuid4())  # Définir unique_link dans le cas POST
-        #ajouter une gestion de l'expiration, par défaut 24h
-        # Créer la room
-        room = Room.objects.create(name=room_name, password=hashed_password, unique_link=unique_link)
+        room = Room.objects.create(name=room_name, password=hashed_password)
+        
         for email in emails:
-            send_invitation_email(request,email, room_name, unique_link)
-        # Rendre le lien unique entre personnes
-        return redirect("home")  
-    return render(request, 'create_room.html', {'unique_link': unique_link})
-#rajouter un fichier d'exception pour la gestion d'erreur pour mdp 
+            unique_link = UniqueLink.objects.create(room=room)
+            send_invitation_email(request, email, room_name, unique_link, password)
+            unique_links.append(unique_link.link)
+        return redirect("home") 
+    return render(request, 'create_room.html', {'unique_links': unique_links})  
 
-# méthode pour envoyer un lien d'accés par mail 🔺 attention rajouter le mdp dedans 
-def send_invitation_email(request, email, room_name, unique_link):
-    lien = f"http://{request.get_host()}/access_room/{unique_link}"
+# méthode pour envoyer un lien d'accés par mail
+def send_invitation_email(request, email, room_name, unique_link, password):
+    lien = f"http://{request.get_host()}/access_room/{unique_link.link}"
     # Configuration du serveur SMTP
     smtp_address = 'smtp.gmail.com'
     smtp_port = 465
@@ -115,12 +112,15 @@ def send_invitation_email(request, email, room_name, unique_link):
     Bonjour, 
     Vous avez été invité à rejoindre le canal {room_name}.
     Lien vers le canal : {lien}
+    Le lien expirera à : {unique_link.expired_at}
     '''
     html = f'''
     <html>
     <body>
     <h1>Bonjour</h1>
     <p>Vous avez été invité à rejoindre le canal {room_name}.</p>
+    <p>Le mot de passe est le suivant : {password}<p>
+    <p>Le lien expirera à : {unique_link.expired_at}</p>
     <a href="{lien}">Cliquez ici pour rejoindre</a>
     </body>
     </html>
@@ -138,6 +138,7 @@ def send_invitation_email(request, email, room_name, unique_link):
             server.sendmail(email_address, email, message.as_string())
     except Exception as e:
         print(f"Erreur lors de l'envoi de l'email : {e}")
+
         
 #  méthode pour acceder à une room avec nom de la room, password et username de l'utilisateur
 def join_room(request):
@@ -156,23 +157,22 @@ def join_room(request):
         return redirect(f'/room/{room.name}/')
     return render(request, 'join_room.html')
 
-# méthode pour acceder à une room depuis le lien unique envoyé par mail, accés par join_room
+# méthode pour accéder à une room depuis le lien unique envoyé par mail
 def access_room(request, unique_link):
     try:
-        room = Room.objects.get(unique_link=unique_link)
-        if request.method == 'POST':
-            room_name = request.POST.get('room_name')
-            username = request.POST.get('username')
-            password = request.POST.get('password')
-            if room_name != room.name:
-                return render(request, 'join_room.html', {'error': 'Nom du canal incorrect'})
-            if room.password and not bcrypt.checkpw(password.encode('utf-8'), room.password.encode('utf-8')):
-                return render(request, 'join_room.html', {'error': 'Mot de passe incorrect'})
-            return redirect(f'/room/{room.name}/')
-        return render(request, 'join_room.html')
-    except Room.DoesNotExist:
-        return HttpResponse("Lien invalide ou expiré.")
-
+        link = UniqueLink.objects.get(link=unique_link)
+    except UniqueLink.DoesNotExist:
+        return HttpResponse("Lien invalide.")
+    if link.check_expiration(): 
+        return HttpResponse("Ce lien est expiré.")
+    room = link.room
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        if room.password and not bcrypt.checkpw(password.encode('utf-8'), room.password.encode('utf-8')):
+            return render(request, 'join_room.html', {'error': 'Mot de passe incorrect'})
+        return redirect(f'/room/{room.name}/')
+    return render(request, 'join_room.html', {'room_name': room.name})
 
 # méthode pour récupérer les messages
 def getMessages(request, room):

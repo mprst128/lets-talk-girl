@@ -1,5 +1,7 @@
 from django.db import models
 from datetime import datetime
+from datetime import timedelta
+from django.utils import timezone
 import uuid
 from cryptography.fernet import Fernet
 from django.conf import settings
@@ -13,7 +15,20 @@ cipher = Fernet(settings.ENCRYPTION_KEY)
 class Room(models.Model):
     name = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
-    unique_link = models.UUIDField(default=uuid.uuid4, editable=False)
+
+
+class UniqueLink(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    link = models.CharField(max_length=255, unique=True, default=uuid.uuid4)  
+    created_at = models.DateTimeField(auto_now_add=True)
+    expired_at = models.DateTimeField(default=timezone.now() + timedelta(hours=2))  
+    is_expired = models.BooleanField(default=False)
+
+    def check_expiration(self):
+        if timezone.now() > self.expired_at:
+            self.is_expired = True
+            self.save()
+        return self.is_expired
 
 
 class Message(models.Model):
