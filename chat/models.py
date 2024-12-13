@@ -33,7 +33,7 @@ class UniqueLink(models.Model):
 
 class Message(models.Model):
     value = models.CharField(max_length=1000)
-    date = models.DateTimeField(default=datetime.now, blank=True)
+    date = models.DateTimeField(default=timezone.now, blank=True)
     user = models.CharField(max_length=1000)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
 
