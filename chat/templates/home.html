@@ -96,9 +96,9 @@
     <div class="container">
       <form id="post-form" method="POST" action="{% url 'join_room' %}">
         {% csrf_token %}
-        <input type="text" name="room_name" placeholder="Room" />
-        <input type="text" name="username" placeholder="Username" />
-        <input type="password" name="password" placeholder="Room Password" />
+        <input type="text" name="room_name" placeholder="Nom de la Room" />
+        <input type="text" name="username" placeholder="Nom" />
+        <input type="password" name="password" placeholder="Mot de Passe" />
         <input type="submit" value="Entrer dans la Room" />
       </form>
     </div>

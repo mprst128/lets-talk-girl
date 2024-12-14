@@ -74,10 +74,11 @@
       background-color: #a64497;
       color: white;
       padding: 14px 20px;
-      margin: 8px 0;
-      border: none;
+      margin-left: 150px;
+      border: center;
       border-radius: 4px;
       cursor: pointer;
+      text-align: center;
     }
 
     input[type="submit"]:hover {
@@ -95,7 +96,9 @@
         </p>
       </div>
       <!-- <form id="post-form"> -->
-      <a href="{% url 'home' %}"><button>Commencer</button></a>
+      <a href="{% url 'home' %}">
+        <input type= "submit" value="Commencer"/>
+      </a>
       <!-- </form> -->
     </div>
   </body>
