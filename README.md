@@ -7,7 +7,9 @@ Le projet met l'accent sur la sécurité et la simplicité, afin de garantir une
 ## Pré-requis
 - Installer django : ```pip install django```
 - Installer WampServer : https://www.wampserver.com/
-- Mettre en place les variables d'environnement nécessaire (la clé privée et le mot de passe de l'adresse mail)
+- Mettre en place les variables d'environnement nécessaire (la clé privée et le mot de passe de l'adresse mail) :
+   * ```export EMAIL_PASSWORD="pfxv vkus gmll qhgt"```
+   * ```$env:ENCRYPTION_KEY="uyyO602N1v2MUfuQz7oCvZuvpEe57icgCvjBDr5ldaw="```
 
 ## Exécution
 Pour lancer ce projet, il vous suffit de vous placer dans le dossier let's-talk-girl et d'exécuter la commande :  ```python manage.py runserver 8080```
