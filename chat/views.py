@@ -12,6 +12,7 @@ from .models import Room
 from .models import Message
 
 import re
+import os
 
 # méthode vue page entrer
 def pageEntrer(request):
@@ -107,7 +108,7 @@ def send_invitation_email(request, email, room_name, unique_link, password):
     message = MIMEMultipart("alternative")
     message["Subject"] = "[Invitation canal] Vous avez été invité à rejoindre ce canal"
     email_address = "no.reply.lets.talk.girl@gmail.com"   
-    email_password = 'pfxv vkus gmll qhgt'   #code genere email gmail à remplacer par une var d'env pour eviter brut
+    email_password = os.getenv('EMAIL_PASSWORD')
     message["From"] = email_address
     message["To"] = email
     #envoyer le mdp à la personne pour qu'elle se connecte mdp en brut
