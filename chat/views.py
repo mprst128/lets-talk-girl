@@ -166,6 +166,7 @@ def join_room(request):
 def access_room(request, unique_link):
     try:
         link = UniqueLink.objects.get(link=unique_link)
+        print(f"Test debug lien unique={UniqueLink.objects.get(link=unique_link)}")
     except UniqueLink.DoesNotExist:
         return HttpResponse("Lien invalide.")
     if link.check_expiration(): 
