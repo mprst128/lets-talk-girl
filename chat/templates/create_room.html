@@ -1,126 +1,167 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    {% load static %}
-    <title>Créer un Canal</title>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;1,200;1,300;1,400&display=swap');
-      * {
-        margin: 0;
-        padding: 0;
-        font-family: 'Montserrat', sans-serif;
-      }
-      body {
-        margin: 0;
-        height: 100vh;
-        max-height: 1000vh;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        background-image: url("{% static 'images/background.jpg' %}");
-        margin-top: -100px;
-      }
-      image {
-        width: 100%;
-        height: 100px;
-        border-radius: 5px;
-      }
-      .container {
-        border: 2px solid #dedede;
-        background-color: #f1f1f1;
-        border-radius: 5px;
-        padding: 20px;
-        margin: 10px 0;
-        margin-top: -100px;
-        width: 450px;
-      }
-      #post-form {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-      }
-      input {
-        padding: 10PX;
-        margin: 8px 0;
-        padding-left: 20px;
-        padding: 20PX 0;
-        padding-left: 5PX;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-      }
-      input[type=submit] {
-        background-color: #a64497;
-        color: white;
-        padding: 14px 20px;
-        margin: 8px 0;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-      input[type=submit]:hover {
-        background-color: #a64497;
-      }
-      button {
-        padding: 10px 15px;
-        background-color: #a64497;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-      button:hover {
-        background-color: #a64497;
-      }
-      .email-field {
-        margin-bottom: 10px;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Créer un Canal</h1>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {% load static %}
+  <title>Créer un Canal</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&display=swap');
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+    }
 
-    <!-- Formulaire pour créer le canal -->
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-image: url("{% static 'images/background.jpg' %}");
+      background-size: cover;
+    }
+
+    .container {
+      background-color: #f1f1f1;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      width: 450px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #000;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    input {
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    #email-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .email-field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .email-field input {
+      flex-grow: 1;
+    }
+
+    .remove-email-btn {
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .remove-email-btn:hover {
+      background-color: #e04343;
+    }
+
+    #add-email-btn {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #a64497;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #add-email-btn:hover {
+      background-color: #832a76;
+    }
+
+    input[type="submit"] {
+      background-color: #a64497;
+      color: white;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #832a76;
+    }
+  </style>
+</head>
+<body>
+  <h1>Créer un Canal</h1>
+
+  <div class="container">
     <form method="POST" action="{% url 'create_room' %}">
       {% csrf_token %}
       <label for="room_name">Nom du canal :</label>
-      <input type="text" name="room_name" required /><br />
+      <input type="text" name="room_name" required />
 
       <label for="password">Mot de passe :</label>
-      <input
-        type="password"
-        id="password"
-        name="password"
+      <input type="password" id="password" name="password"
         pattern="(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}"
-        title="Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial"
-        required
-      /><br />
-
-      {% if error %}
-      <p style="color: red;">{{ error }}</p>
-      {% endif %}
+        title="Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial." required />
 
       <label for="emails">Email(s) d'invitation :</label>
       <div id="email-container">
-        <div class="email-field">
-          <input type="email" name="emails" placeholder="Entrez un email" required />
-        </div>
+        <!-- Les champs email ajoutés dynamiquement apparaîtront ici -->
       </div>
-      <button type="button" id="add-email-button">Ajouter un champ Email</button><br />
+      <button type="button" id="add-email-btn">Ajouter un email</button></br>
+
       <input type="submit" value="Créer le canal">
     </form>
+  </div>
 
-    <script>
-      document.getElementById('add-email-button').addEventListener('click', function () {
-        const emailContainer = document.getElementById('email-container');
-        const emailField = document.createElement('div');
-        emailField.className = 'email-field';
-        emailField.innerHTML = '<input type="email" name="emails" placeholder="Entrez un email" required />';
-        emailContainer.appendChild(emailField);
+  <script>
+    // Fonction pour ajouter un champ d'email
+    document.getElementById('add-email-btn').addEventListener('click', function () {
+      const emailContainer = document.getElementById('email-container');
+
+      // Création d'un nouveau conteneur pour le champ et le bouton de suppression
+      const emailField = document.createElement('div');
+      emailField.classList.add('email-field');
+
+      const input = document.createElement('input');
+      input.type = 'email';
+      input.name = 'emails';
+      input.placeholder = 'Entrez un email';
+      input.required = true;
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.classList.add('remove-email-btn');
+      removeBtn.innerText = 'Supprimer';
+
+      // Ajout du comportement de suppression
+      removeBtn.addEventListener('click', function () {
+        emailField.remove();
       });
-    </script>
-  </body>
+
+      // Ajout des éléments au DOM
+      emailField.appendChild(input);
+      emailField.appendChild(removeBtn);
+      emailContainer.appendChild(emailField);
+    });
+  </script>
+</body>
 </html>
