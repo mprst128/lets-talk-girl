@@ -83,20 +83,20 @@
         box-sizing: border-box;
       }
 
-      input[type=submit] {
-            
+      input[type="submit"] {
+        width: 100%;
         background-color: #a64497;
         color: white;
         padding: 14px 20px;
         margin: 8px 0;
         border: none;
         border-radius: 4px;
-        cursor: pointer; 
-        }
+        cursor: pointer;
+      }
 
-        input[type=submit]:hover {
+      input[type="submit"]:hover {
         background-color: #a64497;
-        }
+      }
 
       div {
         border-radius: 5px;
@@ -147,7 +147,7 @@
             success: function (response) {
               console.log(response);
               var isAtBottom =
-                display.scrollTop() + display.innerHeight() =
+                display.scrollTop() + display.innerHeight() >=
                 display[0].scrollHeight;
               $("#display").empty();
 
@@ -199,7 +199,7 @@
     </script>
 
     <h2 class="title">
-      {{room}} - Groupe <a class="link" href="{% url 'home' %}">Changer de Groupe</a>
+      {{room}} - Groupe <a class="link" href="{% url 'home' %}">Change Group</a>
     </h2>
 
     <!-- Bouton pour afficher/masquer le formulaire de recherche -->
@@ -249,7 +249,7 @@
           value="{{room_details.id}}"
         />
         <input type="text" name="message" id="message" width="100px" />
-        <input type="submit" value="Envoyer" />
+        <input type="submit" value="Send" />
       </form>
     </div>
 
