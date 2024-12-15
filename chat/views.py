@@ -205,20 +205,18 @@ def getMessages(request, room):
     if search_username:
         messages = messages.filter(user__icontains=search_username)
 
-    # Appliquer le filtre par mot-clé dans le message
-    if search_keyword:
-        messages = messages.filter(value__icontains=search_keyword)
-
-
-    # Déchiffrer les messages avant d'envoyer
     decrypted_messages = []
     for message in messages:
         decrypted_message = message.get_decrypted_message()
-        decrypted_messages.append({
-            "user" : message.user,
-            "value": decrypted_message,
-            "date": message.date
-        })
+       
+        # Appliquer le filtre par mot-clé dans le message
+        if search_keyword.lower() in decrypted_message.lower():
+        # Déchiffrer les messages avant d'envoyer
+            decrypted_messages.append({
+                    "user" : message.user,
+                    "value": decrypted_message,
+                    "date": message.date
+                })
 
     return JsonResponse({"messages": decrypted_messages})
     
