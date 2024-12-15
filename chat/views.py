@@ -7,27 +7,11 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import smtplib, ssl
 from django.core.mail import send_mail
-from .models import Room
-from .models import Message
 import re
 import os
 from datetime import datetime
-from django.http import JsonResponse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-from django.shortcuts import render, redirect
-
-# méthode pour ajouter et supprimer l'ajout d'un email
-def create_room(request):
-    if request.method == 'POST':
-        room_name = request.POST['room_name']
-        password = request.POST['password']
-        emails = request.POST.getlist('emails')
-        print(f"Nom du canal : {room_name}")
-        print(f"Mot de passe : {password}")
-        print(f"Emails invités : {emails}")
-        return redirect('success_url')
-    return render(request, 'create_room.html')
 
 # méthode vue page entrer
 def pageEntrer(request):

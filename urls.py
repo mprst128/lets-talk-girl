@@ -13,5 +13,5 @@ urlpatterns = [
     path('join_room/', views.join_room, name='join_room'),  # Page pour rejoindre une room
     path('send/', views.send, name="send"),  # Envoi d'un message
     path('getMessages/<str:room>/', views.getMessages, name="getMessages"),  # Récupération des messages d'une room
-    path('access_room/<uuid:unique_link>/', views.access_room, name='access_room'),
+    path('access_room/<uuid:unique_link>/', views.access_room, name='access_room'), #Accés à une room via un lien unique
 ]
