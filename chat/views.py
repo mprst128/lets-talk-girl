@@ -15,14 +15,30 @@ import re
 import os
 
 # méthode pour ajouter des emails
-def submit_emails(request):
-    if request.method == 'POST':
-        emails = request.POST.getlist('emails')
-        # Traitement des emails, par exemple les sauvegarder dans la base de données
-        print("Emails reçus :", emails)
-        return JsonResponse({'status': 'success', 'message': 'Emails soumis avec succès !'})
+from django.http import JsonResponse
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
-    return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée.'})
+# Méthode pour ajouter des emails
+from django.shortcuts import render, redirect
+
+#méthode pour ajouter et supprimer l'ajout d'un email
+def create_room(request):
+    if request.method == 'POST':
+        room_name = request.POST['room_name']
+        password = request.POST['password']
+        emails = request.POST.getlist('emails')  # Liste des emails soumis
+
+        # Traitez ici les emails
+        print(f"Nom du canal : {room_name}")
+        print(f"Mot de passe : {password}")
+        print(f"Emails invités : {emails}")
+
+        # Sauvegarde ou redirection
+        return redirect('success_url')  # Remplacez par une URL appropriée
+
+    return render(request, 'create_room.html')
+
 
 
 # méthode vue page entrer
