@@ -7,43 +7,32 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import smtplib, ssl
 from django.core.mail import send_mail
-
 from .models import Room
 from .models import Message
-
 import re
 import os
-
-# méthode pour ajouter des emails
 from django.http import JsonResponse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-
-# Méthode pour ajouter des emails
 from django.shortcuts import render, redirect
 
-# Méthode pour ajouter et supprimer l'ajout d'un email
+# méthode pour ajouter et supprimer l'ajout d'un email
 def create_room(request):
     if request.method == 'POST':
         room_name = request.POST['room_name']
         password = request.POST['password']
         emails = request.POST.getlist('emails')
-
         print(f"Nom du canal : {room_name}")
         print(f"Mot de passe : {password}")
         print(f"Emails invités : {emails}")
-
         return redirect('success_url')
-
     return render(request, 'create_room.html')
-
-
 
 # méthode vue page entrer
 def pageEntrer(request):
     return render(request, 'pageEntrer.html')
 
-# méthode vue room, nécessite room_name
+# méthode vue room
 def home(request):
     room_name = request.GET.get('room_name', '')   
     return render(request, 'home.html', {'room_name': room_name})
@@ -52,7 +41,6 @@ def home(request):
 def room(request, room_name):
     username = request.GET.get('username') 
     username = request.session.get('username')
-  
     try:
         room_details = Room.objects.get(name=room_name)  
     except Room.DoesNotExist:
@@ -61,11 +49,9 @@ def room(request, room_name):
     search_username = request.GET.get('username_search', '')  # Si un nom d'utilisateur est fourni
     search_keyword = request.GET.get('keyword_search', '')  # Si un mot-clé est fourni
     messages = Message.objects.filter(room=room_details.id).order_by('date')
-
     # Appliquer le filtre par nom d'utilisateur (si présent)
     if search_username:
         messages = messages.filter(user__icontains=search_username)
-
     # Appliquer le filtre par mot-clé dans le message (si présent)
     if search_keyword:
         messages = messages.filter(value__icontains=search_keyword)
@@ -83,7 +69,6 @@ def send(request):
     message = request.POST['message']
     username = request.POST['username']
     username = request.session.get('username')
-
     room_id = request.POST['room_id']
     if not room_id:
         return HttpResponseBadRequest("L'Id de la room est obligatoire")
@@ -96,6 +81,7 @@ def send(request):
     new_message.save()
     return HttpResponse('Message envoyé avec succès')
 
+# méthode pour valider le mot de passe
 def validate_password(password):
     # vérifie que le mot de passe respecte le pattern
     if not re.match(r"(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}", password):
@@ -109,14 +95,12 @@ def create_room(request):
         room_name = request.POST['room_name']  
         password = request.POST['password']  
         emails = request.POST.getlist('emails')
-       
         if not validate_password(password):
             # Mot de passe invalide, retourner un message d'erreur
+            print(f"Error non affiché :") 
             return render(request, 'create_room.html', {'error': "Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial."})
-
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         room = Room.objects.create(name=room_name, password=hashed_password)
-        
         for email in emails:
             unique_link = UniqueLink.objects.create(room=room)
             send_invitation_email(request, email, room_name, unique_link, password)
@@ -167,7 +151,6 @@ def send_invitation_email(request, email, room_name, unique_link, password):
             server.sendmail(email_address, email, message.as_string())
     except Exception as e:
         print(f"Erreur lors de l'envoi de l'email : {e}")
-
         
 #  méthode pour acceder à une room avec nom de la room, password et username de l'utilisateur
 def join_room(request):
@@ -211,18 +194,14 @@ def getMessages(request, room):
     room_details = Room.objects.get(name=room)
     search_username = request.GET.get('username_search', '')
     search_keyword = request.GET.get('keyword_search', '')
-
     # Récupérer tous les messages de la room
     messages = Message.objects.filter(room=room_details.id).order_by('date')
-
     # Appliquer le filtre par nom d'utilisateur 
     if search_username:
         messages = messages.filter(user__icontains=search_username)
-
     decrypted_messages = []
     for message in messages:
         decrypted_message = message.get_decrypted_message()
-       
         # Appliquer le filtre par mot-clé dans le message
         if search_keyword.lower() in decrypted_message.lower():
         # Déchiffrer les messages avant d'envoyer
@@ -231,6 +210,4 @@ def getMessages(request, room):
                     "value": decrypted_message,
                     "date": message.date
                 })
-
     return JsonResponse({"messages": decrypted_messages})
-    

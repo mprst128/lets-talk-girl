@@ -121,7 +121,9 @@
       <input type="password" id="password" name="password"
         pattern="(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}"
         title="Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial." required />
-
+        {% if error %}
+      <p style="color: red;">{{ error }}</p>
+      {% endif %}
       <label for="emails">Email(s) d'invitation :</label>
       <div id="email-container"></div>
       <button type="button" id="add-email-btn">Ajouter un email</button></br>
