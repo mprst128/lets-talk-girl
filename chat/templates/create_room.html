@@ -123,11 +123,8 @@
         title="Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial." required />
 
       <label for="emails">Email(s) d'invitation :</label>
-      <div id="email-container">
-        <!-- Les champs email ajoutés dynamiquement apparaîtront ici -->
-      </div>
+      <div id="email-container"></div>
       <button type="button" id="add-email-btn">Ajouter un email</button></br>
-
       <input type="submit" value="Créer le canal">
     </form>
   </div>
@@ -137,7 +134,6 @@
     document.getElementById('add-email-btn').addEventListener('click', function () {
       const emailContainer = document.getElementById('email-container');
 
-      // Création d'un nouveau conteneur pour le champ et le bouton de suppression
       const emailField = document.createElement('div');
       emailField.classList.add('email-field');
 
@@ -152,12 +148,10 @@
       removeBtn.classList.add('remove-email-btn');
       removeBtn.innerText = 'Supprimer';
 
-      // Ajout du comportement de suppression
       removeBtn.addEventListener('click', function () {
         emailField.remove();
       });
 
-      // Ajout des éléments au DOM
       emailField.appendChild(input);
       emailField.appendChild(removeBtn);
       emailContainer.appendChild(emailField);

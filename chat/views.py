@@ -22,20 +22,18 @@ from django.core.exceptions import ValidationError
 # Méthode pour ajouter des emails
 from django.shortcuts import render, redirect
 
-#méthode pour ajouter et supprimer l'ajout d'un email
+# Méthode pour ajouter et supprimer l'ajout d'un email
 def create_room(request):
     if request.method == 'POST':
         room_name = request.POST['room_name']
         password = request.POST['password']
-        emails = request.POST.getlist('emails')  # Liste des emails soumis
+        emails = request.POST.getlist('emails')
 
-        # Traitez ici les emails
         print(f"Nom du canal : {room_name}")
         print(f"Mot de passe : {password}")
         print(f"Emails invités : {emails}")
 
-        # Sauvegarde ou redirection
-        return redirect('success_url')  # Remplacez par une URL appropriée
+        return redirect('success_url')
 
     return render(request, 'create_room.html')
 
