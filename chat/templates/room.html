@@ -103,6 +103,40 @@
         background-color: #f2f2f2;
         padding: 20px;
       }
+
+       #emoji-picker,
+      #gif-picker {
+        margin: 10px 0;
+        display: flex;
+        gap: 10px;
+      }
+
+      #emoji-button,
+      #gif-button {
+        background-color: #a64497;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      #emoji-list {
+        display: none;
+        position: absolute;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        z-index: 1000;
+      }
+
+      #emoji-list span {
+        cursor: pointer;
+        padding: 5px;
+        font-size: 20px;
+      }
+
       .link {
         font-size: 14px;
         margin-left: 20px;
@@ -128,35 +162,9 @@
         border: none;
         padding: 10px 15px;
         border-radius: 5px;
-        cursor: pointer;
+        cursor: pointe
       }
 
-      #emoji-gif-container {
-        display: none;
-        position: absolute;
-        bottom: 70px;
-        right: 10px;
-        background-color: #f1f1f1;
-        border-radius: 5px;
-        padding: 10px;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-      }
-
-      .emoji-btn, .gif-btn {
-        background-color: #a64497;
-        color: white;
-        border: none;
-        padding: 10px; 
-        border-radius: 0px;
-        cursor: pointer;
-        font-size: 20px;
-        width: 50px; 
-        height: 50px;
-      }
-    
-      .emoji-btn:hover, .gif-btn:hover {
-        background-color: #8b388d;
-      }
     </style>
     <!-- AJAX -->
     <script
@@ -167,106 +175,15 @@
   </head>
   <body>
     <!-- Récupération des messages en ajax -->
-    <script>
-      $(document).ready(function () {
-        var display = $("#display");
-        var noMessages = $("#no-messages");
-
-        // Fonction pour récupérer les messages filtrés en ajax
-        function getMessagesFiltered() {
-          var username_search = $("#username_search").val();
-          var keyword_search = $("#keyword_search").val();
-
-          $.ajax({
-            type: "GET",
-            url: "/getMessages/{{ room }}/",
-            data: {
-              username_search: username_search,
-              keyword_search: keyword_search,
-            },
-            success: function (response) {
-              console.log(response);
-              var isAtBottom =
-                display.scrollTop() + display.innerHeight() >=
-                display[0].scrollHeight;
-              $("#display").empty();
-
-              // Si aucun message, afficher "Aucun message trouvé"
-              if (response.messages.length === 0) {
-                noMessages.show();
-              } else {
-                noMessages.hide();
-                // Ajouter les messages dans l'affichage
-                for (var key in response.messages) {
-                  var rawDate = new Date(response.messages[key].date);
-                  var formattedDate = rawDate.toLocaleString("fr-FR", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  });
-                  var temp =
-                    "<div class='darker'><b>" +
-                    response.messages[key].user +
-                    "</b><p>" +
-                    response.messages[key].value +
-                    "</p><span>" +
-                    formattedDate +
-                    "</span></div>";
-                  $("#display").append(temp);
-                }
-                // Scroll to the bottom of the chat window if the user is already at the bottom
-                if (isAtBottom) {
-                  $("#display").scrollTop($("#display")[0].scrollHeight);
-                }
-              }
-            },
-            error: function () {
-              alert("An error occurred while fetching the messages.");
-            },
-          });
-        }
-
-        // Fonction pour rafraîchir les messages toutes les 2 secondes
-        setInterval(getMessagesFiltered, 2000);
-
-        // Toggle display of search form
-        $("#search-button").on("click", function () {
-          $("#search-form").toggle();
-        });
-
-        // Soumettre un message
-        $(document).on("submit", "#post-form", function (e) {
-          e.preventDefault();
-
-          $.ajax({
-            type: "POST",
-            url: "/send/",
-            data: {
-              username: $("#username").val(),
-              room_id: $("#room_id").val(),
-              message: $("#message").val(),
-              csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
-            },
-            success: function (data) {
-              $("#message").val(""); // Clear the input
-            },
-            error: function (data) {
-              alert("An error occurred while sending the message.");
-            },
-          });
-        });
-
-        // Toggle emoji and gif picker visibility
-        $(".emoji-btn, .gif-btn").on("click", function () {
-          $("#emoji-gif-container").toggle();
-        });
-      });
-    </script>
-
+    <script
+      src="https://code.jquery.com/jquery-3.1.1.min.js"
+      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
     <h2 class="title">
-      {{ room }} - Groupe <a class="link" href="{% url 'home' %}">Change Group</a>
+      {{room}} - Groupe <a class="link" href="{% url 'home' %}">Change Group</a>
     </h2>
 
     <!-- Bouton pour afficher/masquer le formulaire de recherche -->
@@ -298,37 +215,138 @@
     </div>
 
     <div id="display">
-      <!-- Les messages de chat seront ajoutés ici -->
       <p>Aucun message présent</p>
     </div>
 
     <div class="container">
-      <!-- Emoji and GIF Buttons -->
-      <button class="emoji-btn">😊</button>
-      <button class="gif-btn">GIF</button>
-
       <form id="post-form">
         {% csrf_token %}
         <input
           type="hidden"
           name="username"
           id="username"
-          value="{{ username }}"
+          value="{{username}}"
         />
         <input
           type="hidden"
           name="room_id"
           id="room_id"
-          value="{{ room_details.id }}"
+          value="{{room_details.id}}"
         />
         <input type="text" name="message" id="message" width="100px" />
+        <div id="emoji-picker">
+          <button id="emoji-button" type="button">Emoji</button>
+          <button id="gif-button" type="button">GIF</button>
+        </div>
+        <div id="emoji-list">
+          <span>😂</span>
+          <span>😍</span>
+          <span>🚀</span>
+          <span>🎉</span>
+        </div>
         <input type="submit" value="Send" />
       </form>
-
-      <!-- Container for emoji and gif picker -->
-      <div id="emoji-gif-container">
-        <p>Les Emojis et Gif sont là </p>
-      </div>
     </div>
+
+    <script type="text/javascript">
+      // Pour soumettre le formulaire en AJAX
+      $(document).on("submit", "#post-form", function (e) {
+        e.preventDefault();
+
+        $.ajax({
+          type: "POST",
+          url: "/send/",
+          data: {
+            username: $("#username").val(),
+            room_id: $("#room_id").val(),
+            message: $("#message").val(),
+            csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+          },
+          success: function (data) {
+            // Success handling
+          },
+        });
+        document.getElementById("message").value = "";
+      });
+
+      // Emoji Picker
+      $("#emoji-button").on("click", function () {
+        $("#emoji-list").toggle();
+      });
+
+      $("#emoji-list span").on("click", function () {
+        const emoji = $(this).text();
+        const currentMessage = $("#message").val();
+        $("#message").val(currentMessage + emoji);
+        $("#emoji-list").hide();
+      });
+
+      // GIF Button
+      $("#gif-button").on("click", function () {
+        const gifUrl = prompt("Entrez l'URL du GIF :");
+        if (gifUrl) {
+          const currentMessage = $("#message").val();
+          $("#message").val(currentMessage + ` [GIF: ${gifUrl}]`);
+        }
+      });
+
+      // Fonction pour récupérer les messages filtrés en AJAX
+      function getMessagesFiltered() {
+        var username_search = $("#username_search").val();
+        var keyword_search = $("#keyword_search").val();
+
+        $.ajax({
+          type: "GET",
+          url: "/getMessages/{{ room }}/",
+          data: {
+            username_search: username_search,
+            keyword_search: keyword_search,
+          },
+          success: function (response) {
+            var display = $("#display");
+            var noMessages = $("#no-messages");
+            var isAtBottom =
+              display.scrollTop() + display.innerHeight() >=
+              display[0].scrollHeight;
+
+            $("#display").empty();
+
+            if (response.messages.length === 0) {
+              noMessages.show();
+            } else {
+              noMessages.hide();
+              response.messages.forEach(function (message) {
+                var rawDate = new Date(message.date);
+                var formattedDate = rawDate.toLocaleString("fr-FR", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+                var temp =
+                  `<div class='darker'><b>${message.user}</b><p>${message.value}</p><span>${formattedDate}</span></div>`;
+                $("#display").append(temp);
+              });
+
+              if (isAtBottom) {
+                $("#display").scrollTop($("#display")[0].scrollHeight);
+              }
+            }
+          },
+          error: function () {
+            alert("An error occurred while fetching the messages.");
+          },
+        });
+      }
+
+      // Rafraîchir les messages toutes les 2 secondes
+      setInterval(getMessagesFiltered, 2000);
+
+      // Toggle display of search form
+      $("#search-button").on("click", function () {
+        $("#search-form").toggle();
+      });
+    </script>
   </body>
 </html>

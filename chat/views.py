@@ -14,10 +14,13 @@ from .models import Message
 import re
 import os
 
+# méthode pour ajouter des emails
+from django.http import JsonResponse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-from django.views.decorators.csrf import csrf_exempt
 
+# Méthode pour ajouter des emails
+from django.shortcuts import render, redirect
 
 # Méthode pour ajouter et supprimer l'ajout d'un email
 def create_room(request):
@@ -34,7 +37,7 @@ def create_room(request):
 
     return render(request, 'create_room.html')
 
-@csrf_exempt
+
 
 # méthode vue page entrer
 def pageEntrer(request):
@@ -77,31 +80,21 @@ def room(request, room_name):
 
 # méthode pour envoyer des messages
 def send(request):
-    if request.method == "POST":
-        message = request.POST.get('message', '').strip()
-        username = request.POST.get('username') or request.session.get('username')
-        room_id = request.POST.get('room_id')
+    message = request.POST['message']
+    username = request.POST['username']
+    username = request.session.get('username')
 
-        if not message:
-            return JsonResponse({'error': 'Le message est vide.'}, status=400)
-        if not username:
-            return JsonResponse({'error': 'Le nom d’utilisateur est requis.'}, status=400)
-        if not room_id:
-            return JsonResponse({'error': 'L’ID de la salle est obligatoire.'}, status=400)
-
-        try:
-            room_id = int(room_id)
-        except ValueError:
-            return JsonResponse({'error': 'L’ID de la salle doit être un entier.'}, status=400)
-
-        room = get_object_or_404(Room, id=room_id)
-
-        new_message = Message.objects.create(value=message, user=username, room=room)
-        new_message.save()
-
-        return JsonResponse({'success': 'Message envoyé avec succès !'})
-
-    return JsonResponse({'error': 'Méthode non autorisée.'}, status=405)
+    room_id = request.POST['room_id']
+    if not room_id:
+        return HttpResponseBadRequest("L'Id de la room est obligatoire")
+    try:
+        room_id = int(room_id)
+    except ValueError:
+        return HttpResponseBadRequest("L'Id de la room doit être un integrer.")
+    room = get_object_or_404(Room, id=room_id)
+    new_message = Message.objects.create(value= message , user = username , room = room)
+    new_message.save()
+    return HttpResponse('Message envoyé avec succès')
 
 def validate_password(password):
     # vérifie que le mot de passe respecte le pattern
@@ -215,32 +208,29 @@ def access_room(request, unique_link):
 
 # méthode pour récupérer les messages
 def getMessages(request, room):
-    try:
-        if room.isdigit():
-            room_details = get_object_or_404(Room, id=int(room))
-        else:
-            room_details = get_object_or_404(Room, name=room)
-    except ValueError:
-        return JsonResponse({'error': 'Identifiant ou nom de la salle invalide.'}, status=400)
+    room_details = Room.objects.get(name=room)
+    search_username = request.GET.get('username_search', '')
+    search_keyword = request.GET.get('keyword_search', '')
 
-    username_search = request.GET.get('username_search', '').strip()
-    keyword_search = request.GET.get('keyword_search', '').strip()
+    # Récupérer tous les messages de la room
+    messages = Message.objects.filter(room=room_details.id).order_by('date')
 
-    messages = Message.objects.filter(room=room_details).order_by('date')
-    if username_search:
-        messages = messages.filter(user__icontains=username_search)
+    # Appliquer le filtre par nom d'utilisateur 
+    if search_username:
+        messages = messages.filter(user__icontains=search_username)
 
-    filtered_messages = []
+    decrypted_messages = []
     for message in messages:
-        decrypted_message = getattr(message, 'get_decrypted_message', lambda: message.value)()
+        decrypted_message = message.get_decrypted_message()
+       
+        # Appliquer le filtre par mot-clé dans le message
+        if search_keyword.lower() in decrypted_message.lower():
+        # Déchiffrer les messages avant d'envoyer
+            decrypted_messages.append({
+                    "user" : message.user,
+                    "value": decrypted_message,
+                    "date": message.date
+                })
 
-        if not keyword_search or keyword_search.lower() in decrypted_message.lower():
-            filtered_messages.append({
-                "user": message.user,
-                "value": decrypted_message,
-                "date": message.date.strftime('%d-%m-%Y %H:%M:%S')
-            })
-
-    return JsonResponse({'messages': filtered_messages})
-
+    return JsonResponse({"messages": decrypted_messages})
     
