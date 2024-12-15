@@ -15,6 +15,8 @@ cipher = Fernet(settings.ENCRYPTION_KEY)
 class Room(models.Model):
     name = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
+    def __str__(self):
+        return self.name
 
 
 class UniqueLink(models.Model):
@@ -32,10 +34,12 @@ class UniqueLink(models.Model):
 
 
 class Message(models.Model):
-    value = models.CharField(max_length=1000)
+    value = models.TextField()
     date = models.DateTimeField(default=timezone.now, blank=True)
     user = models.CharField(max_length=1000)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    def __str__(self):
+        return f"{self.user}: {self.value[:50]}"
 
 
     def save(self, *args, **kwargs):
