@@ -14,6 +14,17 @@ from .models import Message
 import re
 import os
 
+# méthode pour ajouter des emails
+def submit_emails(request):
+    if request.method == 'POST':
+        emails = request.POST.getlist('emails')
+        # Traitement des emails, par exemple les sauvegarder dans la base de données
+        print("Emails reçus :", emails)
+        return JsonResponse({'status': 'success', 'message': 'Emails soumis avec succès !'})
+
+    return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée.'})
+
+
 # méthode vue page entrer
 def pageEntrer(request):
     return render(request, 'pageEntrer.html')
