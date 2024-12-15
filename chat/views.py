@@ -11,6 +11,7 @@ from .models import Room
 from .models import Message
 import re
 import os
+from datetime import datetime
 from django.http import JsonResponse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
@@ -120,6 +121,8 @@ def send_invitation_email(request, email, room_name, unique_link, password):
     email_password = os.getenv('EMAIL_PASSWORD')
     message["From"] = email_address
     message["To"] = email
+    date = unique_link.expired_at
+    dateFormat = date.strftime("%d/%m/%Y à %H:%M")
     #envoyer le mdp à la personne pour qu'elle se connecte mdp en brut
     texte = f'''
     Bonjour, 
@@ -133,7 +136,7 @@ def send_invitation_email(request, email, room_name, unique_link, password):
     <h1>Bonjour</h1>
     <p>Vous avez été invité à rejoindre le canal {room_name}.</p>
     <p>Le mot de passe est le suivant : {password}<p>
-    <p>Le lien expirera à : {unique_link.expired_at}</p>
+    <p>Le lien expirera le : {dateFormat}</p>
     <a href="{lien}">Cliquez ici pour rejoindre</a>
     </body>
     </html>
